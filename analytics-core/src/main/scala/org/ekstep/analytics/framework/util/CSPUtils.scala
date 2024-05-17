@@ -1,6 +1,7 @@
 package org.ekstep.analytics.framework.util
 import org.apache.spark.SparkContext
 import org.sunbird.cloud.storage.conf.AppConf
+import org.ekstep.analytics.framework.Level.{ERROR, INFO}
 
 trait ICloudStorageProvider {
   def setConf(sc: SparkContext, storageKey: Option[String], storageSecret: Option[String]): Unit
@@ -63,6 +64,8 @@ object OCIProvider extends ICloudStorageProvider {
     val key = storageKey.filter(_.nonEmpty).map(value => AppConf.getConfig(value)).getOrElse(AppConf.getStorageKey("oci"))
     val secret = storageSecret.filter(_.nonEmpty).map(value => AppConf.getConfig(value)).getOrElse(AppConf.getStorageSecret("oci"))
     JobLogger.log("Configuring OCI Access Key & Secret Key to SparkContext")
+    JobLogger.log("OCIProvider", Some(Map("storageKey" -> storageKey, "storageSecret" -> storageSecret)), INFO)
+    JobLogger.log("OCIProvider", Some(Map("key" -> key, "secret" -> secret)), INFO)
     sc.hadoopConfiguration.set("fs.s3n.awsAccessKeyId", key);
     sc.hadoopConfiguration.set("fs.s3n.awsSecretAccessKey", secret);
     val storageEndpoint = AppConf.getConfig("cloud_storage_endpoint_with_protocol")
