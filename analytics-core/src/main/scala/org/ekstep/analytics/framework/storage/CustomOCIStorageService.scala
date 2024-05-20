@@ -1,10 +1,12 @@
 package org.ekstep.analytics.framework.storage
 
 import org.jclouds.ContextBuilder
+import org.jclouds.aws.s3.AWSS3ApiMetadata
 import org.jclouds.blobstore.{BlobStore, BlobStoreContext}
 import org.sunbird.cloud.storage.BaseStorageService
 import org.sunbird.cloud.storage.Model.Blob
 import org.sunbird.cloud.storage.factory.StorageConfig
+
 import java.util.Properties
 
 
@@ -19,7 +21,7 @@ class CustomOCIStorageService(config: StorageConfig) extends BaseStorageService 
   overrides.setProperty("jclouds.s3.signer-version", "4")
   // var context: BlobStoreContext = ContextBuilder.newBuilder("aws-s3").credentials(config.storageKey, config.storageSecret).overrides(overrides).endpoint(config.endPoint.get).buildView(classOf[BlobStoreContext])
 
-  var context = ContextBuilder.newBuilder("aws-s3")
+  var context = ContextBuilder.newBuilder(new AWSS3ApiMetadata())
     .credentials(config.storageKey, config.storageSecret)
     .overrides(overrides)
     .endpoint(config.endPoint.get).buildView(classOf[BlobStoreContext])
