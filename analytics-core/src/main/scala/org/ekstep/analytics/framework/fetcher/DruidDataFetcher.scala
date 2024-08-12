@@ -154,6 +154,7 @@ object DruidDataFetcher {
   }
 
   def getSQLDruidQuery(model: DruidQueryModel): DruidSQLQuery = {
+    println(s"-------started processing getSQLDruidQuery function --------")
     val intervals = CommonUtil.getIntervalRange(model.intervals, model.dataSource, model.intervalSlider)
     val from = intervals.split("/").apply(0).split("T").apply(0)
     val to = intervals.split("/").apply(1).split("T").apply(0)
@@ -171,7 +172,7 @@ object DruidDataFetcher {
       val sqlString = "SELECT " + columns.mkString(",") +
         " from \"druid\".\"" + model.dataSource + "\" where " +
         "__time >= '" + from + "' AND  __time < '" + to + "'"
-
+      println(s"sqlString = $sqlString")
       DruidSQLQuery(sqlString)
     }
   }
