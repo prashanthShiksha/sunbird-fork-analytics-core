@@ -176,7 +176,7 @@ object DruidDataFetcher {
       DruidSQLQuery(sqlString)
     }
   }
-
+  import io.circe.syntax._
   def executeQueryAsStream(model: DruidQueryModel, query: DruidNativeQuery)(implicit sc: SparkContext, fc: FrameworkContext): RDD[BaseResult] = {
     println(s"-----------inside the executeQueryAsStream -------------")
     implicit val system = if (query.dataSource.contains("rollup") || query.dataSource.contains("distinct") || query.dataSource.contains("snapshot"))
@@ -185,7 +185,10 @@ object DruidDataFetcher {
       fc.getDruidClient().actorSystem
     println(s"system = $system")
     implicit val materializer = ActorMaterializer()
-
+    val queryJson = query.asJson.noSpaces
+    println("\n\n\n\n\n\n================================")
+    println(s"queryJson = $queryJson")
+    println("\n\n\n\n\n\n================================")
     val response =
       if (query.dataSource.contains("rollup") || query.dataSource.contains("distinct") || query.dataSource.contains("snapshot"))
         fc.getDruidRollUpClient().doQueryAsStream(query)
@@ -201,6 +204,7 @@ object DruidDataFetcher {
         })
         .toMat(Sink.fold[RDD[BaseResult], RDD[BaseResult]](sc.emptyRDD[BaseResult])(_ union _))(Keep.right).run()
     }
+    println(s"druidResult = $druidResult")
     val queryWaitTimeInMins = AppConf.getConfig("druid.query.wait.time.mins").toLong
     Await.result(druidResult, scala.concurrent.duration.Duration.apply(queryWaitTimeInMins, "minute"))
   }
